@@ -1,11 +1,11 @@
 const express = require('express')
 const app = express()
 
-const persons = require('./data.js')
+const { persons } = require('./data.js')
 
 
 app.get('/api/persons', (req, res) => {
-  res.send(persons)
+  res.json(persons)
 })
 
 
