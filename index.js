@@ -4,10 +4,12 @@ const app = express()
 let { persons } = require('./data.js')
 
 
+// get all persons
 app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
 
+// get info about phonebook
 app.get('/api/info', (req, res) => {
   const date = new Date()
   res.send(`
@@ -16,6 +18,7 @@ app.get('/api/info', (req, res) => {
   `)
 })
 
+// get person by id
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
@@ -26,6 +29,7 @@ app.get('/api/persons/:id', (req, res) => {
   }
 })
 
+// delete person by id
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   persons = persons.filter(person => person.id !== id)
