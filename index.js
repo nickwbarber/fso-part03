@@ -5,6 +5,12 @@ let { persons } = require('./data.js')
 
 app.use(express.json())
 
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
 // get all persons
 app.get('/api/persons', (req, res) => {
   res.json(persons)
