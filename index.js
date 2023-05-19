@@ -9,12 +9,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 let { persons } = require('./data.js')
 
-const unknownEndpoint = (req, res) => {
-  res.status(404).send({ error: 'unknown endpoint' })
-}
-
-app.use(unknownEndpoint)
-
 // get all persons
 app.get('/api/persons', (req, res) => {
   res.json(persons)
@@ -74,6 +68,9 @@ app.post('/api/persons', (req, res) => {
 
 })
 
+app.use((req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' })
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
