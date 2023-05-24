@@ -28,6 +28,6 @@ const record = new Record({
   number: phoneNumber,
 })
 record.save().then(result => {
-  console.log('record saved!')
+  console.log(`added ${name}'s number ${phoneNumber} to phonebook`)
   mongoose.connection.close()
 })
