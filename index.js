@@ -73,7 +73,7 @@ app.delete('/api/persons/:id', async (req, res) => {
   }
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', async (req, res) => {
   const { name, number } = req.body
 
   if (!name || !number) {
@@ -82,22 +82,23 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  if (hardCodedPersons.find(person => person.name === name)) {
-    return res.status(400).json({
-      error: 'name must be unique'
+  try {
+    if (await Person.findOne({ name: name })) {
+      return res.status(400).json({
+        error: 'name must be unique'
+      })
+    }
+
+    const newPerson = new Person({
+      name: name,
+      number: number,
     })
+    await newPerson.save()
+
+    res.json(newPerson)
+  } catch (err) {
+    console.log('error adding new person:', err)
   }
-
-  const person = {
-    name,
-    number,
-    id: Math.floor(Math.random() * 1000000)
-  }
-
-  hardCodedPersons = hardCodedPersons.concat(person)
-
-  res.json(person)
-
 })
 
 app.use((req, res) => {
