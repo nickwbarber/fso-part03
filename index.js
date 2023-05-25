@@ -22,9 +22,8 @@ app.get('/api/persons', async (req, res) => {
   try {
     const persons = await Person.find({})
     res.json(persons)
-    mongoose.connection.close()
   } catch (err) {
-    console.log(err.message)
+    console.log('get', err.message)
   }
 })
 
@@ -34,25 +33,24 @@ app.get('/api/info', async (req, res) => {
   
   try {
     const persons = await Person.find({})
-    mongoose.connection.close()
 
     const date = new Date()
     res.send(`
       <p>Phonebook has info for ${persons.length} people</p>
       <p>${date}</p>
     `)
+
   } catch (err) {
-    console.log(err.message)
+    console.log('get_info', err.message)
   }
 
 })
 
 // get person by id
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', async (req, res) => {
   try {
-    const id = Number(req.params.id)
-    const person = hardCodedPersons.find(person => person.id === id)
-    // const person = Person.findById(id) // TODO
+    const person = await Person.findById(req.params.id)
+
     if (person) {
       res.json(person)
     } else {
@@ -60,7 +58,7 @@ app.get('/api/persons/:id', (req, res) => {
     }
 
   } catch (err) {
-    console.log(err.message)
+    console.log('get_by_id', err.message)
   }
 })
 
