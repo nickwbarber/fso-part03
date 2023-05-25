@@ -15,7 +15,7 @@ morgan.token('body', req => `body: ${JSON.stringify(req.body)}`)
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 // TODO: Replace with db model `Person`
-const { persons } = require('./data.js')
+const { persons: hardCodedPersons } = require('./data.js')
 
 // get all persons
 app.get('/api/persons', (req, res) => {
@@ -30,7 +30,12 @@ app.get('/api/persons', (req, res) => {
 })
 
 // get info about phonebook
-app.get('/api/info', (req, res) => {
+app.get('/api/info', async (req, res) => {
+  // get persons
+  
+  const persons = await Person.find({})
+  mongoose.connection.close()
+
   const date = new Date()
   res.send(`
     <p>Phonebook has info for ${persons.length} people</p>
@@ -41,7 +46,7 @@ app.get('/api/info', (req, res) => {
 // get person by id
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id)
+  const person = hardCodedPersons.find(person => person.id === id)
   if (person) {
     res.json(person)
   } else {
@@ -52,7 +57,7 @@ app.get('/api/persons/:id', (req, res) => {
 // delete person by id
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  persons = persons.filter(person => person.id !== id)
+  hardCodedPersons = hardCodedPersons.filter(person => person.id !== id)
   res.status(204).end()
 })
 
@@ -65,7 +70,7 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  if (persons.find(person => person.name === name)) {
+  if (hardCodedPersons.find(person => person.name === name)) {
     return res.status(400).json({
       error: 'name must be unique'
     })
@@ -77,7 +82,7 @@ app.post('/api/persons', (req, res) => {
     id: Math.floor(Math.random() * 1000000)
   }
 
-  persons = persons.concat(person)
+  hardCodedPersons = hardCodedPersons.concat(person)
 
   res.json(person)
 
