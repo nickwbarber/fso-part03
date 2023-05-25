@@ -3,7 +3,8 @@ const morgan = require('morgan')
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const Note = require('./models/note')
+const Person = require('./models/record')
+const { default: mongoose } = require('mongoose')
 
 app.use(cors())
 app.use(express.json())
@@ -13,11 +14,19 @@ app.use(express.static('build'))
 morgan.token('body', req => `body: ${JSON.stringify(req.body)}`)
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let { persons } = require('./data.js')
+// TODO: Replace with db model `Person`
+const { persons } = require('./data.js')
 
 // get all persons
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({})
+  .then(persons => res.json(persons))
+  .finally(() => {
+    mongoose.connection.close()
+  })
+  .catch(err => {
+    console.log(err.message)
+  })
 })
 
 // get info about phonebook
