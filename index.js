@@ -63,10 +63,14 @@ app.get('/api/persons/:id', async (req, res) => {
 })
 
 // delete person by id
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  hardCodedPersons = hardCodedPersons.filter(person => person.id !== id)
-  res.status(204).end()
+app.delete('/api/persons/:id', async (req, res) => {
+  try {
+    const deletedPerson = await Person.findByIdAndDelete(req.params.id)
+    console.log('deleted', deletedPerson)
+    res.status(204).end()
+  } catch (err) {
+    console.log('delete error: ', err.message)
+  }
 })
 
 app.post('/api/persons', (req, res) => {
