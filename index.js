@@ -49,12 +49,18 @@ app.get('/api/info', async (req, res) => {
 
 // get person by id
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
-  const person = hardCodedPersons.find(person => person.id === id)
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).end()
+  try {
+    const id = Number(req.params.id)
+    const person = hardCodedPersons.find(person => person.id === id)
+    // const person = Person.findById(id) // TODO
+    if (person) {
+      res.json(person)
+    } else {
+      res.status(404).end()
+    }
+
+  } catch (err) {
+    console.log(err.message)
   }
 })
 
