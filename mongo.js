@@ -12,7 +12,7 @@ switch (MODE) {
     Record.find({}).then(result => {
       console.log('phonebook:')
       result.map(record => {
-        console.log(`${record.name} ${record.number}`)
+        console.log(`name: ${record.name} number: ${record.number} id: ${record._id.toString()}`)
       })
       mongoose.connection.close()
     })
