@@ -5,6 +5,15 @@ const recordSchema = new mongoose.Schema({
   name: String,
   number: Number,
 })
+// scrub unused fields
+recordSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+// export model
 const Record = mongoose.model('Record', recordSchema)
 
 // connect to db
