@@ -1,4 +1,4 @@
-DELETE http://localhost:3001/api/persons/2
+DELETE http://localhost:3001/api/persons/646f5cae3479817def23741a
 
 ### should return 404 if note does not exist
 DELETE http://localhost:3001/api/persons/-1
