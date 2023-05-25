@@ -18,29 +18,33 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 const { persons: hardCodedPersons } = require('./data.js')
 
 // get all persons
-app.get('/api/persons', (req, res) => {
-  Person.find({})
-  .then(persons => res.json(persons))
-  .finally(() => {
+app.get('/api/persons', async (req, res) => {
+  try {
+    const persons = await Person.find({})
+    res.json(persons)
     mongoose.connection.close()
-  })
-  .catch(err => {
+  } catch (err) {
     console.log(err.message)
-  })
+  }
 })
 
 // get info about phonebook
 app.get('/api/info', async (req, res) => {
   // get persons
   
-  const persons = await Person.find({})
-  mongoose.connection.close()
+  try {
+    const persons = await Person.find({})
+    mongoose.connection.close()
 
-  const date = new Date()
-  res.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${date}</p>
-  `)
+    const date = new Date()
+    res.send(`
+      <p>Phonebook has info for ${persons.length} people</p>
+      <p>${date}</p>
+    `)
+  } catch (err) {
+    console.log(err.message)
+  }
+
 })
 
 // get person by id
