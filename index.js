@@ -67,6 +67,21 @@ app.get('/api/persons/:id', async (req, res, next) => {
   }
 })
 
+// update record if already existing
+app.put('/api/persons/:id', async (req, res, next) => {
+  const { name, number } = req.body
+  try {
+    const updatedPerson = await Person.findByIdAndUpdate(
+      req.params.id,
+      { name: name, number: number },
+      { new: true }
+    )
+    res.json(updatedPerson)
+  } catch (err) {
+    next(err)
+  }
+})
+
 // delete person by id
 app.delete('/api/persons/:id', async (req, res, next) => {
   try {
