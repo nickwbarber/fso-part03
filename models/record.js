@@ -26,7 +26,16 @@ const recordSchema = new mongoose.Schema({
     minLength: 3,
     required: true,
   },
-  number: Number,
+  number: {
+    type: String,
+    validate: {
+      validator: (v =>
+           /\d{2}-\d{6}/.test(v)
+        || /\d{3}-\d{5}/.test(v)
+      ),
+      message: props => `${props.value} is not a valid phone number`,
+    },
+  },
 })
 
 // scrub unused fields
