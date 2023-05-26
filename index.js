@@ -1,38 +1,42 @@
 require('dotenv').config()
-const morgan = require('morgan')
+const morgan  = require('morgan')     // logging
 const express = require('express')
-const cors = require('cors')
-const app = express()
-const Person = require('./models/record')
-const { default: mongoose } = require('mongoose')
+const cors    = require('cors')
+const app     = express()
 
-app.use(cors())
-app.use(express.json())
+// models
+const Person  = require('./models/record')
+
 app.use(express.static('build'))
+app.use(express.json())
+app.use(cors())
 
 // logging
 morgan.token('body', req => `body: ${JSON.stringify(req.body)}`)
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-// TODO: Replace with db model `Person`
-const { persons: hardCodedPersons } = require('./data.js')
-
-// get all persons
-app.get('/api/persons', async (req, res) => {
+app.get('/api/persons', async (req, res, next) => {
   try {
     const persons = await Person.find({})
+    if (!persons) {
+      res.status(404).end()
+    }
     res.json(persons)
   } catch (err) {
-    console.log('get', err.message)
+    next(err)
+    //// old way
+    // console.log('get', err.message)
+    // res.status(500).end()
   }
 })
 
-// get info about phonebook
-app.get('/api/info', async (req, res) => {
-  // get persons
-  
+app.get('/api/info', async (req, res, next) => {
   try {
     const persons = await Person.find({})
+
+    if (!persons) {
+      res.status(404).end()
+    }
 
     const date = new Date()
     res.send(`
@@ -41,39 +45,42 @@ app.get('/api/info', async (req, res) => {
     `)
 
   } catch (err) {
-    console.log('get_info', err.message)
+    next(err)
+    //// old way
+    // console.log('get_info', err.message)
+    // res.status(500).end()
   }
-
 })
 
-// get person by id
-app.get('/api/persons/:id', async (req, res) => {
+app.get('/api/persons/:id', async (req, res, next) => {
   try {
     const person = await Person.findById(req.params.id)
-
-    if (person) {
-      res.json(person)
-    } else {
+    if (!person) {
       res.status(404).end()
     }
-
+    res.json(person)
   } catch (err) {
-    console.log('get_by_id', err.message)
+    next(err)
+    //// old way
+    // console.log('get_by_id', err.message)
+    // res.status(400).send({ error: 'malformatted id'})
   }
 })
 
 // delete person by id
-app.delete('/api/persons/:id', async (req, res) => {
+app.delete('/api/persons/:id', async (req, res, next) => {
   try {
     const deletedPerson = await Person.findByIdAndDelete(req.params.id)
     console.log('deleted', deletedPerson)
     res.status(204).end()
   } catch (err) {
-    console.log('delete error: ', err.message)
+    next(err)
+    //// old way
+    // console.log('delete error: ', err.message)
   }
 })
 
-app.post('/api/persons', async (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
   const { name, number } = req.body
 
   if (!name || !number) {
@@ -97,12 +104,24 @@ app.post('/api/persons', async (req, res) => {
 
     res.json(newPerson)
   } catch (err) {
-    console.log('error adding new person:', err)
+    next(err)
+    //// old way
+    // console.log('error adding new person:', err)
   }
 })
 
+// handle undefined routes
 app.use((req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
+})
+
+// handle errors
+app.use((err, req, res, next) => {
+  console.error(err.message)
+  if (err.name === "CastError") {
+    return res.status(400).send({ error: 'malformatted id'})
+  }
+  next(error)
 })
 
 const PORT = process.env.PORT || 3001
