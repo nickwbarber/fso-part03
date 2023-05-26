@@ -128,7 +128,7 @@ app.use((req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 })
 
-// handle errors
+// error handler
 app.use((err, req, res, next) => {
   console.error(err.message)
   if (err.name === "CastError") {
